@@ -9,7 +9,7 @@ from nonebot.adapters import Message
 from nonebot.params import CommandArg, Event
 from nonebot.adapters.onebot.v11 import Event as V11Event, GroupMessageEvent, Bot
 from nonebot import require, get_bot
-from .utils import *
+from .utils_old import *
 
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler

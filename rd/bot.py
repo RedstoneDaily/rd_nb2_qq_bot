@@ -1,5 +1,4 @@
 import nonebot
-from nonebot.adapters.console import Adapter
 from nonebot.adapters.onebot import V11Adapter
 
 # 初始化 NoneBot
@@ -7,11 +6,8 @@ nonebot.init()
 
 # 注册适配器
 driver = nonebot.get_driver()
-driver.register_adapter(Adapter)
 driver.register_adapter(V11Adapter)
 
-v11adapter = nonebot.get_adapter(V11Adapter)
-# v11adapter.config()
 
 # 在这里加载插件
 nonebot.load_builtin_plugins("echo")  # 内置插件

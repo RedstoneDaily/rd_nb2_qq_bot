@@ -6,7 +6,7 @@ import nonebot
 from nonebot.adapters import Message
 from nonebot.params import CommandArg, Event
 from nonebot import require
-from .utils import get_args, get_permission
+from .utils_old import get_args, get_permission
 
 require("nonebot_plugin_localstore")
 import nonebot_plugin_localstore as store
