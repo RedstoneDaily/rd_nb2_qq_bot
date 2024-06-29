@@ -1,2 +1,1 @@
-from database import *
-from user import *
+from .decorators import *

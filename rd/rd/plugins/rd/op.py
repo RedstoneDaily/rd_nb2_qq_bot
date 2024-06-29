@@ -11,12 +11,6 @@ from .utils_old import get_args, get_permission
 require("nonebot_plugin_localstore")
 import nonebot_plugin_localstore as store
 
-test = on_command("test")
-
-@test.handle()
-async def test_cmd(event: GroupMessageEvent, args: Message = CommandArg()):
-    await test.finish(json.dumps(get_args(event)))
-
 
 op = on_command("op")
 

@@ -1,4 +1,4 @@
-from user import User
+from .user import User
 import nonebot
 
 bot = nonebot.get_bot()  # 获取nonebot实例

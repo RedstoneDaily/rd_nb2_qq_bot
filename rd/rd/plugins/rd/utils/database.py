@@ -13,7 +13,6 @@ password = _config.db_password
 
 # 连接数据库
 client = pymongo.MongoClient(host, port, username=username, password=password)
-db = client['redstone_daily']
 
 
 class Database:
@@ -37,12 +36,9 @@ class Database:
         return self.collection
 
 
-db = Database()
-
-
 # 导出数据库
 def get_database(collection_name):
     # 获取数据库实例
-    db_copy = deepcopy(db)
-    db_copy.set_collection(collection_name)
-    return db_copy
+    db = Database()
+    db.set_collection(collection_name)
+    return db

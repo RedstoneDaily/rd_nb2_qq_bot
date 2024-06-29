@@ -48,5 +48,5 @@ from .manage import *
 群管指令
 """
 
-from rd.rd.plugins.rd.utils.database import *
+# from rd.rd.plugins.rd.utils.database import *
 # scheduler.add_job(run_every_day, "cron", hour=16, minute=30, next_run_time=datetime.datetime.now() + datetime.timedelta(minutes=1))  # 每天16:30执行一次

@@ -1,16 +1,14 @@
 from nonebot.adapters.onebot.v11 import MessageSegment
-import database as db
+from . import database as db
 import nonebot
 
-bot = nonebot.get_bot()
-
 # 数据库
-permissions = db.get_database('permissions')
-subscribers = db.get_database('subscribers')
+permissions = db.get_database('permissions').collection
+subscribers = db.get_database('subscribers').collection
 
 class User:
-    def __init__(self, id):
-        if type(self.id) != int:  # 确保QQ号为整数
+    def __init__(self, id: int):
+        if type(id) != int:  # 确保QQ号为整数
             raise TypeError('QQ号必须为整数')
         self.id = id
 
@@ -19,7 +17,12 @@ class User:
         获取用户权限
         """
 
-        return permissions.find_one({'id': self.id})['permission']
+        permission_doc = permissions.find_one({'id': self.id})  # 获取用户权限
+
+        if permission_doc is None:  # 如果用户没有权限，则默认为0
+            return 0
+
+        return permission_doc['permission']  # 返回用户权限
 
     def set_subscriber(self, sub: bool):
         """
@@ -39,10 +42,10 @@ class User:
 
         return subscribers.find_one({'id': str(self.id)})['sub']
 
-    def send_msg(self, msg: MessageSegment):
+    async def send_msg(self, msg: MessageSegment):
          """
          发送私聊消息
          :param msg: 要发送的消息
          """
 
-         bot.send_private_msg(user_id=self.id, message=msg)
+         await nonebot.get_bot().send_private_msg(user_id=self.id, message=msg)

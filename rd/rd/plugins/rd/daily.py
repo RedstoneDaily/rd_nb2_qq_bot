@@ -3,8 +3,10 @@ from nonebot.plugin import *
 import requests, nonebot
 from nonebot.adapters import Message
 from nonebot.params import CommandArg, Event
-from nonebot.adapters.onebot.v11 import Event as V11Event
+from nonebot.adapters.onebot.v11 import Event as V11Event, GroupMessageEvent, Bot
 from nonebot import require
+
+from . import utils
 
 require("nonebot_plugin_apscheduler")
 from nonebot_plugin_apscheduler import scheduler
@@ -15,6 +17,7 @@ import nonebot_plugin_localstore as store
 """
 Redstone Daily日报的获取与推送
 """
+
 
 def get_daily():
     """
@@ -41,11 +44,14 @@ def get_daily():
 
     log = f"最新日报: {data['title']}\n"  # 发送消息
     head = (f"今日前三甲: \n\n壹 {videos[0]['title']}\n{videos[0]['data']['play']} / {videos[0]['data']['like']} / "
-            f"{videos[0]['data']['coin']} / {videos[0]['data']['favorite']} / {videos[0]['data']['share']} = {round(videos[0]['data']['score'], 2)}\n\n") if len(videos) >= 1 else ""
+            f"{videos[0]['data']['coin']} / {videos[0]['data']['favorite']} / {videos[0]['data']['share']} = {round(videos[0]['data']['score'], 2)}\n\n") if len(
+        videos) >= 1 else ""
     second = (f"贰 {videos[1]['title']}\n{videos[1]['data']['play']} / {videos[1]['data']['like']} / "
-              f"{videos[1]['data']['coin']} / {videos[1]['data']['favorite']} / {videos[1]['data']['share']} = {round(videos[1]['data']['score'], 2)}\n\n") if len(videos) >= 2 else ""
+              f"{videos[1]['data']['coin']} / {videos[1]['data']['favorite']} / {videos[1]['data']['share']} = {round(videos[1]['data']['score'], 2)}\n\n") if len(
+        videos) >= 2 else ""
     third = (f"叁 {videos[2]['title']}\n{videos[2]['data']['play']} / {videos[2]['data']['like']} / "
-             f"{videos[2]['data']['coin']} / {videos[2]['data']['favorite']} / {videos[2]['data']['share']} = {round(videos[2]['data']['score'], 2)}\n\n") if len(videos) >= 3 else ""
+             f"{videos[2]['data']['coin']} / {videos[2]['data']['favorite']} / {videos[2]['data']['share']} = {round(videos[2]['data']['score'], 2)}\n\n") if len(
+        videos) >= 3 else ""
     link = f"更多内容请访问：https://redstonedaily.top/#/daily/{data['title'].split('-')[0]}/{data['title'].split('-')[1]}/{data['title'].split('-')[2]}"
 
     return log + head + second + third + link
@@ -131,7 +137,6 @@ async def subscribe_daily(event: Event):
     await subscribe.finish("订阅成功！请加bot好友以接收日报推送！（这是必须的要求）可以加群291728287获取通知")
 
 
-
 unsubscribe = on_command("unsub")
 
 
@@ -157,3 +162,11 @@ async def unsubscribe_daily(event: Event):
         pass
     except:
         await unsubscribe.finish("你还没有订阅过日报推送！")
+
+test = on_command("test")
+
+
+@test.handle()
+@utils.permission_required(99)
+async def handle_event(event: V11Event):
+    await test.finish("测试成功！")
