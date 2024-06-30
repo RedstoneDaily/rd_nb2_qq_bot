@@ -4,8 +4,7 @@ from nonebot.params import CommandArg
 from nonebot.exception import ActionFailed
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message, Bot
 
-from RedstoneDaily.Utils import get_permission, get_args
-
+from utils import permission_required, get_context, User
 
 ban_matcher = on_command('ban', force_whitespace=True)
 mute_matcher = on_command('mute', force_whitespace=True)
@@ -17,52 +16,65 @@ time_mapping = {'D': (24 * 60 * 60 * 60), 'H': (60 * 60), 'M': 60, 'S': 1}
 
 
 @ban_matcher.handle()
-async def handle_ban(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
-    ''' 拉黑 '''
-    arg = get_args(args)  # 获取命令参数
-    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
-    if sender_permission < 90:  # 如果用户等级不足90级，则拒绝执行
-        await ban_matcher.finish(F'你需要 9 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
+@permission_required(9)
+async def handle_ban(bot: Bot, event: GroupMessageEvent):
+    '''
+        拉黑
+        :param bot: Bot 对象
+        :param event: GroupMessageEvent 对象
+    '''
+    sender, arg, group = get_context(event)
+    victim = User(arg[0])
+
     if len(arg) != 1 or (not arg.isdigit()):  # 如果参数个数不为1，则提醒用户输入正确的参数
         await ban_matcher.finish('参数错误，请重新输入！')
-    user = int(arg)  # 将 QQ 号转换为数字
-    # 如果被拉黑的用户权限高于执行者，则拒绝执行
-    if get_permission(user) >= sender_permission:
-        await ban_matcher.finish('你不能拉黑比自己权限高的人！')
-    try:
-        await bot.set_group_kick(group_id=event.group_id, user_id=int(arg[0]), reject_add_request=True)
-    except ActionFailed:
-        await mute_matcher.finish('没有权限执行此操作！')
 
-    await title_matcher.finish(F'已将用户 {user} 拉黑。')
+    # 如果被拉黑的用户权限高于执行者，则拒绝执行
+    if victim.get_permission() >= sender.get_permission():
+        await ban_matcher.finish('你不能拉黑比自己权限高的人！')
+
+    try:
+        await group.ban(victim.id, bot)
+    except ActionFailed:
+        await ban_matcher.finish('没有权限执行此操作！')
+
+    await ban_matcher.finish(F'已将用户 {victim.id} 拉黑。')
 
 
 @mute_matcher.handle()
-async def handle_mute(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
-    ''' 禁言命令 '''
-    args = get_args(args)  # 获取命令参数
-    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
-    if sender_permission < 8:  # 如果用户等级不足 8 级，则拒绝执行
-        await mute_matcher.finish(F'你需要 8 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
-    if len(args) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数
+@permission_required(8)
+async def handle_mute(bot: Bot, event: GroupMessageEvent):
+    '''
+        禁言命令
+        :param bot: Bot 对象
+        :param event: GroupMessageEvent 对象
+    '''
+    sender, arg, group = get_context(event)
+
+    if len(arg) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数
         await mute_matcher.finish('参数错误，请重新输入！')
-    mute_user, time = args  # 获取禁言用户和禁言时间
-    if not mute_user.isdigit():  # 如果禁言用户不是纯数字，则提醒用户输入正确的参数
+
+    victim, time = arg  # 获取禁言用户和禁言时间
+    if not victim.isdigit():  # 如果禁言用户不是纯数字，则提醒用户输入正确的参数
         await mute_matcher.finish('第一个参数用户 QQ 号格式错误，请重新输入！')
-    mute_user = int(mute_user)  # 将禁言用户转换为数字
-    if get_permission(mute_user) >= sender_permission:  # 如果被禁言的用户权限高于执行者，则拒绝执行
+
+    victim = User(victim)  # 将禁言用户转换为User对象
+    if victim.get_permission() >= sender.get_permission():  # 如果被禁言的用户权限高于执行者，则拒绝执行
         await mute_matcher.finish('你不能禁言比自己权限高的人！')
+
     if not time[:-1].isdigit():  # 如果禁言时间不是纯数字，则提醒用户输入正确的参数
         await mute_matcher.finish('第二个参数禁言时间不是数字，请重新输入！')
+
     # 将禁言时间转换为秒数
     time = (int(time[:-1]) * time_mapping.get(time[-1].upper(), 0))
     if time <= 0:  # 如果禁言时间小于或等于 0，则提醒用户输入正确的参数
         await mute_matcher.finish('时间参数输入错误或者格式不正确，请重新尝试！')
-    try:
-        await bot.set_group_ban(group_id=event.group_id, user_id=mute_user, duration=time)
+
+    try:  # 禁言用户
+        group.mute(victim.id, time, bot)
     except ActionFailed:
         await mute_matcher.finish('没有权限执行此操作！')
-    await mute_matcher.finish(F'已将用户 {mute_user} 禁言 {time} 秒。')
+    await mute_matcher.finish(F'已将用户 {victim.id} 禁言 {time} 秒。')
 
 
 @kick_matcher.handle()
