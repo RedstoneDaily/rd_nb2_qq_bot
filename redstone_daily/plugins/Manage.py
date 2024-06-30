@@ -15,8 +15,8 @@ nickname_matcher = on_command('set_nickname', force_whitespace=True)
 time_mapping = {'D': (24 * 60 * 60 * 60), 'H': (60 * 60), 'M': 60, 'S': 1}
 
 
-@ban_matcher.handle()
 @permission_required(9)
+@ban_matcher.handle()
 async def handle_ban(bot: Bot, event: GroupMessageEvent):
     '''
         拉黑
@@ -41,14 +41,14 @@ async def handle_ban(bot: Bot, event: GroupMessageEvent):
     await ban_matcher.finish(F'已将用户 {victim.id} 拉黑。')
 
 
-@mute_matcher.handle()
 @permission_required(8)
+@mute_matcher.handle()
 async def handle_mute(bot: Bot, event: GroupMessageEvent):
-    '''
+    """
         禁言命令
         :param bot: Bot 对象
         :param event: GroupMessageEvent 对象
-    '''
+    """
     sender, arg, group = get_context(event)
 
     if len(arg) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数

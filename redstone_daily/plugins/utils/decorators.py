@@ -11,10 +11,10 @@ def permission_required(perm: int):
     :return: 装饰器
     """
     def decorator(func):
-        async def wrapper(event: Event):
+        async def wrapper(event: Event, *args, **kwargs):
             sender = User(event.user_id)   # 获取用户信息
             if sender.get_permission() >= perm:  # 判断用户权限是否满足要求
-                return await func(event)  # 执行函数
+                return await func(event, *args, **kwargs)  # 执行函数
             else:   # 权限不足
                 bot = nonebot.get_bot()
                 if isinstance(event, GroupMessageEvent):
