@@ -1,4 +1,4 @@
-from .Plugins.Config import config
+from .plugins.Config import config
 from .Data import OpreationPermissions
 
 from nonebot.adapters.onebot.v11 import Message, Bot

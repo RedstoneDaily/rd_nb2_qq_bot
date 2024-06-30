@@ -1,6 +1,6 @@
-from RedstoneDaily.Plugins.Config import config
-from RedstoneDaily.Data import OpreationPermissions
-from RedstoneDaily.Utils import turn_message, get_permission, get_args
+from redstone_daily.plugins.Config import config
+from redstone_daily.Data import OpreationPermissions
+from redstone_daily.Utils import turn_message, get_permission, get_args
 
 from nonebot import on_command
 from nonebot.params import CommandArg

@@ -4,7 +4,7 @@ from nonebot.params import CommandArg
 from nonebot.exception import ActionFailed
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message, Bot
 
-from utils import permission_required, get_context, User
+from redstone_daily.plugins.utils import permission_required, get_context, User
 
 ban_matcher = on_command('ban', force_whitespace=True)
 mute_matcher = on_command('mute', force_whitespace=True)

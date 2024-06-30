@@ -12,7 +12,6 @@ class Config(BaseModel):
     broadcast_time: list[int] = []
     broadcast_groups: list[int] = []
 
-    @field_validator('boardcast_time')
     @classmethod
     def check_superusers(self, value: list[int]):
         if len(value) != 2:
@@ -24,7 +23,6 @@ class Config(BaseModel):
             raise ValueError('the second item of list must be between 0 and 59 because it is minute')
         return value
 
-    @field_validator('boardcast_groups')
     @classmethod
     def check_broadcast_groups(self, value: list[int]):
         if not value:

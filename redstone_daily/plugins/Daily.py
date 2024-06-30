@@ -1,6 +1,6 @@
 from .Config import config
-from RedstoneDaily.Data import Subscribers
-from RedstoneDaily.Utils import turn_message, broadcast_message
+from redstone_daily.Data import Subscribers
+from redstone_daily.Utils import turn_message, broadcast_message
 
 import requests
 from datetime import datetime, timedelta

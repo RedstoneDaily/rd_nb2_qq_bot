@@ -19,7 +19,7 @@ class Data:
 
     def load(self):
         # 加载数据文件
-        self.file_path = get_data_file('RedstoneDaily', self.file_path)
+        self.file_path = get_data_file('redstone_daily', self.file_path)
         if self.file_path.exists():
             with self.file_path.open('r', encoding='Utf-8') as file:
                 self.opreation_permissions = load(file)
