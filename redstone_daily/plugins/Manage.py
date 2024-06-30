@@ -54,11 +54,11 @@ async def handle_mute(bot: Bot, event: GroupMessageEvent):
     if len(arg) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数
         await mute_matcher.finish('参数错误，请重新输入！')
 
-    victim, time = arg  # 获取禁言用户和禁言时间
-    if not victim.isdigit():  # 如果禁言用户不是纯数字，则提醒用户输入正确的参数
+    victim_id, time = arg  # 获取禁言用户和禁言时间
+    if not victim_id.isdigit():  # 如果禁言用户不是纯数字，则提醒用户输入正确的参数
         await mute_matcher.finish('第一个参数用户 QQ 号格式错误，请重新输入！')
 
-    victim = User(victim)  # 将禁言用户转换为User对象
+    victim = User(int(victim_id))  # 将禁言用户转换为User对象
     if victim.get_permission() >= sender.get_permission():  # 如果被禁言的用户权限高于执行者，则拒绝执行
         await mute_matcher.finish('你不能禁言比自己权限高的人！')
 
@@ -71,7 +71,7 @@ async def handle_mute(bot: Bot, event: GroupMessageEvent):
         await mute_matcher.finish('时间参数输入错误或者格式不正确，请重新尝试！')
 
     try:  # 禁言用户
-        group.mute(victim.id, time, bot)
+        await group.mute(victim, time)
     except ActionFailed:
         await mute_matcher.finish('没有权限执行此操作！')
     await mute_matcher.finish(F'已将用户 {victim.id} 禁言 {time} 秒。')
