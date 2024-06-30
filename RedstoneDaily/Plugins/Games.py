@@ -14,14 +14,13 @@ import nonebot_plugin_localstore as store
 娱乐功能
 """
 
-divine = on_command("今日人品")
+divine = on_command("luck")
 
 
 @divine.handle()
 async def handle_divine(event: Event):
     """
     今日人品
-    :return:
     """
 
     _time = time.time()  # 获取当前时间

@@ -1,0 +1,130 @@
+import nonebot
+from nonebot import on_command
+from nonebot.params import CommandArg
+from nonebot.exception import ActionFailed
+from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message, Bot
+
+from RedstoneDaily.Utils import get_permission, get_args
+
+
+ban_matcher = on_command('ban', force_whitespace=True)
+mute_matcher = on_command('mute', force_whitespace=True)
+kick_matcher = on_command('kick', force_whitespace=True)
+title_matcher = on_command('set_title', force_whitespace=True)
+nickname_matcher = on_command('set_nickname', force_whitespace=True)
+# 时间单位映射表
+time_mapping = {'D': (24 * 60 * 60 * 60), 'H': (60 * 60), 'M': 60, 'S': 1}
+
+
+@ban_matcher.handle()
+async def handle_ban(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
+    ''' 拉黑 '''
+    arg = get_args(args)  # 获取命令参数
+    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
+    if sender_permission < 90:  # 如果用户等级不足90级，则拒绝执行
+        await ban_matcher.finish(F'你需要 9 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
+    if len(arg) != 1 or (not arg.isdigit()):  # 如果参数个数不为1，则提醒用户输入正确的参数
+        await ban_matcher.finish('参数错误，请重新输入！')
+    user = int(arg)  # 将 QQ 号转换为数字
+    # 如果被拉黑的用户权限高于执行者，则拒绝执行
+    if get_permission(user) >= sender_permission:
+        await ban_matcher.finish('你不能拉黑比自己权限高的人！')
+    try:
+        await bot.set_group_kick(group_id=event.group_id, user_id=int(arg[0]), reject_add_request=True)
+    except ActionFailed:
+        await mute_matcher.finish('没有权限执行此操作！')
+
+    await title_matcher.finish(F'已将用户 {user} 拉黑。')
+
+
+@mute_matcher.handle()
+async def handle_mute(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
+    ''' 禁言命令 '''
+    args = get_args(args)  # 获取命令参数
+    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
+    if sender_permission < 8:  # 如果用户等级不足 8 级，则拒绝执行
+        await mute_matcher.finish(F'你需要 8 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
+    if len(args) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数
+        await mute_matcher.finish('参数错误，请重新输入！')
+    mute_user, time = args  # 获取禁言用户和禁言时间
+    if not mute_user.isdigit():  # 如果禁言用户不是纯数字，则提醒用户输入正确的参数
+        await mute_matcher.finish('第一个参数用户 QQ 号格式错误，请重新输入！')
+    mute_user = int(mute_user)  # 将禁言用户转换为数字
+    if get_permission(mute_user) >= sender_permission:  # 如果被禁言的用户权限高于执行者，则拒绝执行
+        await mute_matcher.finish('你不能禁言比自己权限高的人！')
+    if not time[:-1].isdigit():  # 如果禁言时间不是纯数字，则提醒用户输入正确的参数
+        await mute_matcher.finish('第二个参数禁言时间不是数字，请重新输入！')
+    # 将禁言时间转换为秒数
+    time = (int(time[:-1]) * time_mapping.get(time[-1].upper(), 0))
+    if time <= 0:  # 如果禁言时间小于或等于 0，则提醒用户输入正确的参数
+        await mute_matcher.finish('时间参数输入错误或者格式不正确，请重新尝试！')
+    try:
+        await bot.set_group_ban(group_id=event.group_id, user_id=mute_user, duration=time)
+    except ActionFailed:
+        await mute_matcher.finish('没有权限执行此操作！')
+    await mute_matcher.finish(F'已将用户 {mute_user} 禁言 {time} 秒。')
+
+
+@kick_matcher.handle()
+async def handle_kick(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
+    ''' 踢人命令 '''
+    arg = get_args(args)  # 获取命令参数
+    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
+    if sender_permission < 9:  # 如果用户等级不足 9 级，则拒绝执行
+        await kick_matcher.finish(F'你需要 9 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
+    if len(arg) != 1 or (not arg.isdigit()):  # 如果参数个数不为1，且 QQ 号不是纯数字，则提醒用户输入正确的参数
+        await kick_matcher.finish('参数错误，请重新输入！')
+    user = int(arg)  # 将 QQ 号转换为数字
+    # 如果被踢的用户权限高于执行者，则拒绝执行
+    if get_permission(user) >= sender_permission:
+        await kick_matcher.finish('你不能踢比自己权限高的人！')
+    try:
+        await bot.set_group_kick(group_id=event.group_id, user_id=int(arg[0]), reject_add_request=False)
+    except ActionFailed:
+        await kick_matcher.finish('没有权限执行此操作！')
+    await kick_matcher.finish(F'已将用户 {user} 踢出群聊。')
+
+
+@title_matcher.handle()
+async def handle_title(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
+    ''' 改变群头衔 '''
+    arg = get_args(args)  # 获取命令参数
+    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
+    if sender_permission < 8:  # 如果用户等级不足 8 级，则拒绝执行
+        await title_matcher.finish(F'你需要 8 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
+    if len(arg) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数
+        await title_matcher.finish('参数错误，请重新输入！')
+    user, title = args
+    if not user.isdigit():  # 如果 QQ 号不是纯数字，则提醒用户输入正确的参数
+        await title_matcher.finish('第一个参数用户 QQ 号格式错误，请重新输入！')
+    user = int(user)  # 将 QQ 号转换为数字
+    # 如果被改头衔的用户权限高于执行者，则拒绝执行
+    if get_permission(user) >= sender_permission:
+        await title_matcher.finish('你不能更改比自己权限高的人的头衔！')
+    try:
+        await bot.set_group_special_title(group_id=event.group_id, user_id=user, special_title=title, duration=-1)
+    except ActionFailed:
+        await mute_matcher.finish('没有权限执行此操作！')
+    await title_matcher.finish(F'已将用户 {user} 的头衔改为 {title}。')
+
+
+@nickname_matcher.handle()
+async def handle_nickname(bot: Bot, event: GroupMessageEvent, args: Message = CommandArg()):
+    ''' 改变群昵称 '''
+    args = get_args(args)  # 获取命令参数
+    sender_permission = get_permission(event.get_user_id())  # 获取发送者权限
+    if sender_permission < 6:  # 如果用户等级不足60级，则拒绝执行
+        await nickname_matcher.finish(F'你需要 6 级以上权限才能执行此命令！你的权限为 {sender_permission} 级。')
+    if len(args) != 2:  # 如果参数个数不为2，则提醒用户输入正确的参数
+        await nickname_matcher.finish('参数错误，请重新输入！')
+    user, nickname = args  # 获取 QQ 号和昵称
+    if not user.isdigit():  # 如果 QQ 号不是纯数字，则提醒用户输入正确的参数
+        await nickname_matcher.finish('第一个参数用户 QQ 号格式错误，请重新输入！')
+    user = int(user)  # 将 QQ 号转换为数字
+    if get_permission(user) >= sender_permission:  # 如果被改名的用户权限高于执行者，则拒绝执行
+        await nickname_matcher.finish('你不能改名比自己权限高的人！')
+    try:
+        await bot.set_group_card(group_id=event.group_id, user_id=user, card=nickname)
+    except ActionFailed:
+        await nickname_matcher.finish('没有权限执行此操作！')
+    await nickname_matcher.finish(F'已将用户 {user} 的群昵称改为 {nickname}。')
