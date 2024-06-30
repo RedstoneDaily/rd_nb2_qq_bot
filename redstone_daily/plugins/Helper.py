@@ -41,8 +41,8 @@ async def rd_commands(args: Message = CommandArg()):
         'OP指令: .op',
         '24点游戏: .24point',
         '禁言: .mute',
-        '修改昵称: .set_nickname',
-        '修改头衔: .set_title',
+        '修改昵称: .nickname',
+        '修改头衔: .title',
         '踢出群聊: .kick',
         '封禁: .ban',
     ]

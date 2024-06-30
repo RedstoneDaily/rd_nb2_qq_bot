@@ -16,7 +16,7 @@ class Group(object):
         """
 
         bot = nonebot.get_bot()  # 获取nonebot实例
-        await bot.set_group_ban(group_id=self.id, user_id=user.id, duration=duration_sec * 60)
+        await bot.set_group_ban(group_id=self.id, user_id=user.id, duration=duration_sec)
 
     async def unmute(self, user: User):
         """
