@@ -31,6 +31,17 @@ class User:
 
         return permission_doc['permission']  # 返回用户权限
 
+    def set_permission(self, permission: int):
+        """
+        设置用户权限
+        :param permission: 权限值
+        """
+
+        if type(permission) != int:  # 确保权限值为整数
+            raise TypeError('权限值必须为整数')
+
+        permissions.update_one({'id': self.id}, {'$set': {'permission': permission}}, upsert=True)
+
     def set_subscriber(self, sub: bool):
         """
         设置用户订阅状态

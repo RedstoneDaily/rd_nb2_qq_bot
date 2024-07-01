@@ -1,5 +1,6 @@
 import json
 
+from .database import get_database
 from .decorators import *
 from .user import *
 from .group import *
@@ -54,8 +55,12 @@ def get_all_ops() -> list:
     """
     获取所有管理
     返回: 管理列表 格式
-    [[1234567890, 10],  # [QQ号, 权限等级]
-        [9876543210, 5]]
+    [{
+    'id': int,
+    'permission': int
+    },...]
     """
 
+    permissions = get_database('permissions').collection.find()  # 获取所有权限\
 
+    return permissions  # 返回权限列表
