@@ -1,6 +1,6 @@
 from nonebot.adapters.onebot.v11 import MessageSegment
 from . import database as db
-import nonebot
+import nonebot, nonebot.adapters.onebot.v11
 
 # 数据库
 permissions = db.get_database('permissions').collection
@@ -11,6 +11,13 @@ class User:
         if type(id) != int:  # 确保QQ号为整数
             raise TypeError('QQ号必须为整数')
         self.id = id
+
+    @property
+    def permission(self) -> int:
+        """
+        获取用户权限
+        """
+        return self.get_permission()
 
     def get_permission(self) -> int:
         """

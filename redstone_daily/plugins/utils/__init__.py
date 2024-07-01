@@ -6,6 +6,7 @@ from .group import *
 from nonebot.adapters.onebot.v11.event import GroupMessageEvent
 from nonebot.adapters.onebot.v11 import Event
 
+
 def get_context(event: Event):
     """
     获取事件的上下文信息(发送者的utils.user.User对象, 指令参数, 群聊的utils.group.Group对象(如果是群聊消息))
@@ -47,3 +48,14 @@ def get_context(event: Event):
     args = get_args(event)
 
     return [user, args, group]
+
+
+def get_all_ops() -> list:
+    """
+    获取所有管理
+    返回: 管理列表 格式
+    [[1234567890, 10],  # [QQ号, 权限等级]
+        [9876543210, 5]]
+    """
+
+
