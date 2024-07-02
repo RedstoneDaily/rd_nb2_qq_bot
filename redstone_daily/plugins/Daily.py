@@ -9,6 +9,8 @@ from nonebot import get_bot, on_command, require
 from nonebot.exception import FinishedException
 from nonebot.adapters.onebot.v11 import Event, Bot
 
+from .utils import get_context, get_database, User
+
 require('nonebot_plugin_apscheduler')
 from nonebot_plugin_apscheduler import scheduler
 
@@ -40,23 +42,24 @@ async def latest_daily(bot: Bot):
 @subscribe_mathcer.handle()
 async def handle_subscribe(event: Event):
     ''' 订阅日报推送 '''
-    if (user := event.get_user_id()) in Subscribers.data:
+    sender, arg, group = get_context(event)
+
+    if sender.is_subscriber():
         await subscribe_mathcer.finish('你已经订阅过日报推送了！')  # 已经订阅过
     # 没有订阅过，则添加
-    Subscribers.data.append(user)
+    sender.set_subscribe(True)
     await subscribe_mathcer.finish('订阅成功，请加 Bot 好友以接收日报推送！若未添加好友，你将不会收到推送。')
 
 
 @unsubscribe_matcher.handle()
 async def handle_unsubscribe(event: Event):
     ''' 取消日报推送 '''
-    # 获取qq号
-    user = event.get_user_id()
+    sender, arg, group = get_context(event)
     # 确认是否订阅过
-    if user not in Subscribers.data:
+    if not sender.is_subscriber():
         await unsubscribe_matcher.finish('你还没有订阅过日报推送！')  # 未订阅过
     # 取消订阅
-    Subscribers.data.remove(user)
+    sender.set_subscribe(False)
     await unsubscribe_matcher.finish('取消订阅成功！')
 
 
@@ -97,19 +100,19 @@ async def everyday_task():
     # 向每个推送群发送消息
     await broadcast_message(bot, message)
     # 推送订阅者
-    for number in Subscribers.data:
-        # 发送私聊消息
-        try:
-            await bot.send_private_msg(user_id=number, message=message)
-        except FinishedException:
-            pass
-        except Exception:
-            Subscribers.data.remove(number)  # 移除出错的订阅者
-            message = F'在尝试推送日报给用户 {number} 时出错，已移除此订阅者！请加好友后尝试重新订阅。'
-            await broadcast_message(bot, message)
-    # 保存订阅者数据
-    Subscribers.save()
+    for doc in get_database('subscribers').collection.find():
 
+        user = User(doc['id'])
+        if doc['sub']:
+            # 发送私聊消息
+            try:
+                await user.send(message)
+            except FinishedException:
+                pass
+            except Exception:
+                user.set_subscribe(False)  # 移除出错的订阅者
+                message = F'在尝试推送日报给用户 {doc} 时出错，已移除此订阅者！请加好友后尝试重新订阅。'
+                await broadcast_message(bot, message)
 
 hour, minute = config.broadcast_time
 next_run_time = (datetime.now() + timedelta(minutes=1))  # 下一次运行时间

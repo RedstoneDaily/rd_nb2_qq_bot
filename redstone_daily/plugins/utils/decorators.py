@@ -20,7 +20,7 @@ def permission_required(perm: int):
                 if isinstance(event, GroupMessageEvent):
                     await bot.send_group_msg(group_id=event.group_id, message=f'你需要{perm}级权限才能执行此操作')  # 发送权限不足消息
                 else:
-                    await sender.send_msg(f'你需要{perm}级权限才能执行此操作')
+                    await sender.send(f'你需要{perm}级权限才能执行此操作')
 
         return wrapper
 

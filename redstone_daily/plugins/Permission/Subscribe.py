@@ -23,16 +23,16 @@ op_sub_clear_matcher = on_command(
 async def perm_sub_add(event: Event):
     sender, arg, group = get_context(event)
 
-    user_id = arg[2]
-    if not user_id.isdigit():  # 输入的 QQ 号格式不正确
-        await op_sub_add_matcher.finish('输入的 QQ 号格式不正确，请重新输入后尝试！')
+    for user_id in arg[2:]:
+        if not user_id.isdigit():  # 输入的 QQ 号格式不正确
+            await op_sub_add_matcher.send('输入的 QQ 号格式不正确，请重新输入后尝试！')
 
-    user = User(int(user_id))
-    if user.is_subscriber:  # 输入的 QQ 号已经订阅过了
-        await op_sub_add_matcher.finish('该用户已经订阅过了，无法重复设置。')
+        user = User(int(user_id))
+        if user.is_subscriber():  # 输入的 QQ 号已经订阅过了
+            await op_sub_add_matcher.send('该用户已经订阅过了，无法重复设置。')
 
-    user.set_subscribe(True)
-    await op_sub_add_matcher.finish(F'设置用户 {user.id} 订阅成功！')
+        user.set_subscribe(True)
+        await op_sub_add_matcher.send(F'设置用户 {user.id} 订阅成功！')
 
 
 @op_sub_list_matcher.handle()
@@ -55,15 +55,16 @@ async def perm_sub_list(event: Event):
 async def perm_sub_remove(event: Event):
     sender, arg, group = get_context(event)
 
-    if not arg[2].isdigit():
-        await op_sub_remove_matcher.finish('输入的 QQ 号格式不正确，请重新输入后尝试！')
+    for user_id in arg[2:]:
+        if not user_id.isdigit():  # 输入的 QQ 号格式不正确
+            await op_sub_add_matcher.send('输入的 QQ 号格式不正确，请重新输入后尝试！')
 
-    user = User(int(arg[2]))
-    if not user.is_subscriber:
-        await op_sub_remove_matcher.finish('该用户没有订阅过，无法取消订阅。')
+        user = User(int(user_id))
+        if not user.is_subscriber():  # 输入的 QQ 号没有订阅过
+            await op_sub_remove_matcher.finish('该用户没有订阅过，无法取消订阅。')
 
-    user.set_subscribe(False)
-    await op_sub_remove_matcher.finish(F'取消用户 {user.id} 订阅成功！')
+        user.set_subscribe(False)
+        await op_sub_remove_matcher.finish(F'取消用户 {user.id} 订阅成功！')
 
 
 @op_sub_clear_matcher.handle()
@@ -71,7 +72,7 @@ async def perm_sub_remove(event: Event):
 async def perm_sub_clear(event: Event):
     sender, arg, group = get_context(event)
 
-    if arg[2] == 'confirm':  # 确认清空所有订阅用户
+    if len(arg) == 3 and arg[2] == 'confirm':  # 确认清空所有订阅用户
         get_database('subscribers').clear()
         await op_sub_clear_matcher.finish('已清空所有订阅用户！')
 

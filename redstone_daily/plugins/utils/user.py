@@ -51,10 +51,10 @@ class User:
 
         sub = subscribers.find({'id': self.id})
 
-        '''for i in sub:  # 遍历订阅表，找到用户的订阅状态
-            return i['sub']'''
+        for i in sub:  # 遍历订阅表，找到用户的订阅状态
+            return i['sub']
 
-        return False
+        return False  # 未订阅
 
     def set_subscribe(self, sub: bool):
         """
@@ -67,7 +67,7 @@ class User:
 
         subscribers.update_one({'id': self.id}, {'$set': {'sub': sub}}, upsert=True)
 
-    async def send_msg(self, msg: MessageSegment):
+    async def send(self, msg: MessageSegment):
         """
          发送私聊消息
          :param msg: 要发送的消息
