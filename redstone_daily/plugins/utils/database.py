@@ -35,6 +35,9 @@ class Database:
         # 获取集合实例
         return self.collection
 
+    def clear(self):
+        # 清空集合
+        self.collection.delete_many({})
 
 # 导出数据库
 def get_database(collection_name):

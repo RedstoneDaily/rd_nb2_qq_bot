@@ -49,14 +49,14 @@ class User:
         :return: 订阅状态
         """
 
-        sub = subscribers.find_one({'id': str(self.id)})['sub']
+        sub = subscribers.find({'id': self.id})
 
-        if sub is None:  # 如果用户没有订阅状态，则默认为False
-            return False
+        '''for i in sub:  # 遍历订阅表，找到用户的订阅状态
+            return i['sub']'''
 
-        return sub  # 返回用户订阅状态
+        return False
 
-    def set_subscriber(self, sub: bool):
+    def set_subscribe(self, sub: bool):
         """
         设置用户订阅状态
         :param sub: 订阅状态
@@ -65,7 +65,7 @@ class User:
         if type(sub) != bool:  # 确保订阅状态为布尔值
             raise TypeError('订阅状态必须为布尔值')
 
-        subscribers.update_one({'id': str(self.id)}, {'$set': {'sub': sub}}, upsert=True)
+        subscribers.update_one({'id': self.id}, {'$set': {'sub': sub}}, upsert=True)
 
     async def send_msg(self, msg: MessageSegment):
         """
