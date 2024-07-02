@@ -6,6 +6,7 @@ import nonebot, nonebot.adapters.onebot.v11
 permissions = db.get_database('permissions').collection
 subscribers = db.get_database('subscribers').collection
 
+
 class User:
     def __init__(self, id: int):
         if type(id) != int:  # 确保QQ号为整数
@@ -42,6 +43,19 @@ class User:
 
         permissions.update_one({'id': self.id}, {'$set': {'permission': permission}}, upsert=True)
 
+    def is_subscriber(self) -> bool:
+        """
+        获取用户订阅状态
+        :return: 订阅状态
+        """
+
+        sub = subscribers.find_one({'id': str(self.id)})['sub']
+
+        if sub is None:  # 如果用户没有订阅状态，则默认为False
+            return False
+
+        return sub  # 返回用户订阅状态
+
     def set_subscriber(self, sub: bool):
         """
         设置用户订阅状态
@@ -53,17 +67,10 @@ class User:
 
         subscribers.update_one({'id': str(self.id)}, {'$set': {'sub': sub}}, upsert=True)
 
-    def is_subscriber(self) -> bool:
-        """
-        获取用户订阅状态
-        """
-
-        return subscribers.find_one({'id': str(self.id)})['sub']
-
     async def send_msg(self, msg: MessageSegment):
-         """
+        """
          发送私聊消息
          :param msg: 要发送的消息
          """
 
-         await nonebot.get_bot().send_private_msg(user_id=self.id, message=msg)
+        await nonebot.get_bot().send_private_msg(user_id=self.id, message=msg)
