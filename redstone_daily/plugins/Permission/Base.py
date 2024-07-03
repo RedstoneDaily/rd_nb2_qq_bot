@@ -16,8 +16,6 @@ perm_query_matcher = on_command(
     'op query', force_whitespace=True, priority=10, block=True)
 perm_set_matcher = on_command(
     'op add', force_whitespace=True, priority=10, block=True)
-perm_reset_matcher = on_command(
-    'op reset', force_whitespace=True, priority=10, block=True)
 
 
 @perm_matcher.handle()
@@ -75,10 +73,3 @@ async def handle_perm_set(event: Event):
     user.set_permission(permission)  # 设置用户权限
     await perm_set_matcher.finish(F'用户 {user.id} 的操作权限已设置为 {permission} 级。')
 
-
-@perm_reset_matcher.handle()
-async def handle_operation_permission_reset(event: GroupMessageEvent):
-    if get_permission(event.user_id) < 10:
-        await perm_reset_matcher.finish(F'您没有权限执行此操作。')
-    OpreationPermissions.data = {user: 10 for user in config.superusers}
-    await perm_reset_matcher.finish(F'超级用户的操作权限已重置为 10 级。')

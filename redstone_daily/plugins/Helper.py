@@ -30,21 +30,22 @@ async def rd_commands(args: Message = CommandArg()):
     arg = args.extract_plain_text().split(' ')  # 取出参数
 
     commands_list = [
-        '最新日报: .latest',
-        '帮助信息: .rdhelp',
-        '指令列表: .commands',
-        '使用教程: .tutorial',
-        '关于我们: .about',
-        '订阅日报推送: .sub',
-        '取消日报推送: .unsub',
-        '新用户欢迎: .welcomenew',
-        'OP指令: .op',
-        '24点游戏: .24point',
-        '禁言: .mute',
-        '修改昵称: .nickname',
-        '修改头衔: .title',
-        '踢出群聊: .kick',
-        '封禁: .ban',
+        '最新日报: latest',
+        '帮助信息: rdhelp',
+        '指令列表: commands',
+        '使用教程: tutorial',
+        '关于我们: about',
+        '订阅日报推送: sub',
+        '取消日报推送: unsub',
+        '新用户欢迎: welcomenew',
+        'OP指令: op',
+        '禁言: mute',
+        '修改昵称: nickname',
+        '修改头衔: title',
+        '踢出群聊: kick',
+        '封禁: ban',
+        '运势: luck',
+        '命运骰子: dice',
     ]
 
     async def send_commands(start, end, page):
@@ -86,68 +87,71 @@ async def rd_tutorial(args: Message = CommandArg()):
     # 处理参数
     if command:
         if command == 'latest':
-            await tutorial.finish('.latest 显示最新一期的日报\n'
+            await tutorial.finish('latest 显示最新一期的日报\n'
                                   '参数: 无需参数')
         elif command == 'rdhelp':
-            await tutorial.finish('.rdhelp 显示帮助信息\n'
+            await tutorial.finish('rdhelp 显示帮助信息\n'
                                   '参数: 无需参数')
         elif command == 'commands':
-            await tutorial.finish('.commands 显示指令列表\n'
+            await tutorial.finish('commands 显示指令列表\n'
                                   '参数: 无需参数')
         elif command == 'about':
-            await tutorial.finish('.about 关于我们的信息\n'
+            await tutorial.finish('about 关于我们的信息\n'
                                   '参数: 无需参数')
         elif command == 'tutorial':
-            await tutorial.finish('.tutorial 显示使用教程\n'
+            await tutorial.finish('tutorial 显示使用教程\n'
                                   '参数: [command] 查看此指令的详细教程')
         elif command == 'sub':
-            await tutorial.finish('.sub 订阅日报推送\n'
+            await tutorial.finish('sub 订阅日报推送\n'
                                   '参数: 无需参数')
         elif command == 'unsub':
-            await tutorial.finish('.unsub 取消日报推送\n'
+            await tutorial.finish('unsub 取消日报推送\n'
                                   '参数: 无需参数')
         elif command == 'welcome':
-            await tutorial.finish('.welcomenew 新用户欢迎\n'
+            await tutorial.finish('welcomenew 新用户欢迎\n'
                                   '参数: 无需参数')
         elif command == 'op':
             await tutorial.finish(
-                '.op OP指令\n'
+                'op OP指令\n'
                 '参数: {command} [args]\n'
                 'OP指令列表:\n'
-                '.op sub clear  清空订阅\n'
-                '.op set {qq_number} {permission}  设置权限\n'
-                '.op query [qq_number]  获取自己的权限\n'
-                '.op sub query {qq_number}  查询订阅\n'
-                '.op sub remove {qq_number}  删除订阅\n'
-                '.op sub add {qq_number}  添加订阅\n'
+                'op sub clear  清空订阅\n'
+                'op set {qq_number} {permission}  设置权限\n'
+                'op query [qq_number]  获取自己的权限\n'
+                'op sub query {qq_number}  查询订阅\n'
+                'op sub remove {qq_number}  删除订阅\n'
+                'op sub add {qq_number}  添加订阅\n'
             )
-        elif command == '24point':
-            await tutorial.finish('.24point 24点游戏\n'
-                                  '参数: [option]'
-                                  'option: 无: 开始游戏 answer {your_answer}: 回答游戏 giveup: 放弃游戏\n')
         elif command == 'mute':
-            await tutorial.finish('.mute 禁言\n'
+            await tutorial.finish('mute 禁言\n'
                                   '参数: {qq_number} {duration} 禁言指定用户\n'
                                   'duration用法: \n'
                                   '示例: 30s: 30秒 根据后缀字母 s.m.h.d 表示秒.分.时.天')
         elif command == 'set_nickname':
-            await tutorial.finish('.set_nickname 修改昵称\n'
+            await tutorial.finish('set_nickname 修改昵称\n'
                                   '参数: {qq_number} {new_nickname}')
         elif command == 'set_title':
-            await tutorial.finish('.set_title 修改头衔\n'
+            await tutorial.finish('set_title 修改头衔\n'
                                   '参数: {qq_number} {new_title}')
         elif command == 'kick':
-            await tutorial.finish('.kick 踢人\n'
+            await tutorial.finish('kick 踢人\n'
                                   '参数: {qq_number} 踢出指定用户')
         elif command == 'ban':
-            await tutorial.finish('.ban 封禁\n'
+            await tutorial.finish('ban 封禁\n'
                                   '参数: {qq_number}封禁指定用户')
+        elif command == 'luck':
+            await tutorial.finish('luck 今日运势 aliases=运势, 人品, 今日人品, jrrp\n'
+                                  '参数: 无需参数')
+        elif command == 'dice':
+            await tutorial.finish('dice 命运骰子 aliases=命运骰子, 命运色子\n'
+                                  '指定一位成员参与, 随机禁言成员或者发送者\n'
+                                  '参数: {qq_number}参与者')
         else:
             await tutorial.finish('指令不存在')
     else:
         await tutorial.finish('RD QQ Bot使用教程\n---------\n'
                               '常规指令格式: .指令 选项1 选项2\n'
-                              '使用/tutorial 指令名 查看该指令的详细教程\n'
+                              '使用tutorial [指令名] 查看该指令的详细教程\n'
                               '选填参数[会以这种格式显示], 必填参数{会以这种格式显示}\n'
                               '---------')
 

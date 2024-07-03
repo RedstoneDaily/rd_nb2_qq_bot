@@ -66,7 +66,7 @@ async def handle_mute(event: GroupMessageEvent):
 
     # 将禁言时间转换为秒数
     time = (int(time[:-1]) * time_mapping.get(time[-1].upper(), 0))
-    if time <= 0:  # 如果禁言时间小于或等于 0，则提醒用户输入正确的参数
+    if time < 0:  # 如果禁言时间小于或等于 0，则提醒用户输入正确的参数
         await mute_matcher.finish('时间参数输入错误或者格式不正确，请重新尝试！')
 
     try:  # 禁言用户
