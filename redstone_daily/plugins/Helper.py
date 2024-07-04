@@ -145,7 +145,7 @@ async def rd_tutorial(args: Message = CommandArg()):
         elif command == 'dice':
             await tutorial.finish('dice 命运骰子 aliases=命运骰子, 命运色子\n'
                                   '指定一位成员参与, 随机禁言成员或者发送者\n'
-                                  '参数: {qq_number}参与者')
+                                  '参数: {qq_number}参与者 []')
         else:
             await tutorial.finish('指令不存在')
     else:
