@@ -15,7 +15,7 @@ perm_list_matcher = on_command(
 perm_query_matcher = on_command(
     'op query', force_whitespace=True, priority=10, block=True)
 perm_set_matcher = on_command(
-    'op add', force_whitespace=True, priority=10, block=True)
+    'op set', force_whitespace=True, priority=10, block=True)
 
 
 @perm_matcher.handle()
