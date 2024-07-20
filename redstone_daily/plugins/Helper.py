@@ -165,5 +165,5 @@ async def rd_about():
     显示关于我们信息
     '''
     await about.finish('红石日报Redstone Daily是一个开源非盈利的网站项目，收集跟进全网红石科技最新前沿进展，并以日报、周报、月报以及年报的形式发布。\n'
-                       '更多信息请访问：https://redstonedaily.top/, https://docs.qq.com/doc/DTW9CZEVCcFNhR0px\n'
+                       '更多信息请访问：https://redstonedaily.top/, https://redstone-daily.notion.site/Redstone-Daily-7e55265d870b424594c74acb65e3f62a\n'
                        'RD QQ Bot作者: @creepebucket(creepebucket@qq.com), @LonelySail(xiaocaicai_email@sina.com)')

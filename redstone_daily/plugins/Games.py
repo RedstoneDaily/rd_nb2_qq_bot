@@ -28,10 +28,46 @@ async def handle_divine(event: Event):
 
     _time = time.time()  # 获取当前时间
     sender = event.user_id  # 取出发送者
-    random.seed(int(sender) + int(_time - _time % 86400))  # 设置随机种子
 
-    await divine.finish(f"你今天的运势是：{random.randint(1, 200)}%"
-                        if random.randint(1, 1000) != 1 else "你今天的运势是：114514%")  # 发送随机数
+    _time += 28800  # 时差8小时
+    random.seed(int(sender) + int(_time - _time % 86400))  # 随机种子
+
+    # 计算人品(运势, 财富, 事业, 健康)
+    luck = random.normalvariate(0, 15)
+    money = random.normalvariate(0, 15)
+    career = random.normalvariate(0, 15)
+    health = random.normalvariate(0, 15)
+
+    # 计算均值
+    mean = (luck + money + career + health) / 4
+
+    def get_score(score):
+        # 评价分数映射表
+        score_map = {
+            -50: "衰神附体",
+            -40: "倒了血霉",
+            -30: "运势极差",
+            -20: "运势不佳",
+            -10: "运势较差",
+            0: "运势一般",
+            10: "运势较好",
+            20: "运势优秀",
+            30: "运势极佳",
+            40: "神佛降临",
+            50: "天命赐福"}
+
+        for i in score_map:
+            if score <= i + 5:
+                return score_map[i] + f"({round(score, 2)}%)" if score < 0 else score_map[i] + f"(+{round(score, 2)}%)"
+
+    await divine.finish(f"今日人品: \n"
+                        f"-------------\n"
+                        f"运势: {get_score(luck)}\n"
+                        f"财富: {get_score(money)}\n"
+                        f"事业: {get_score(career)}\n"
+                        f"健康: {get_score(health)}\n"
+                        f"-------------\n"
+                        f"总评: {get_score(mean)}")
 
 
 '''at_bot = on_message(rule=to_me())

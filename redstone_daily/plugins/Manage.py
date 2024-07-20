@@ -12,7 +12,7 @@ kick_matcher = on_command('kick', force_whitespace=True)
 title_matcher = on_command('title', force_whitespace=True)
 nickname_matcher = on_command('nickname', force_whitespace=True)
 # 时间单位映射表
-time_mapping = {'D': (24 * 60 * 60 * 60), 'H': (60 * 60), 'M': 60, 'S': 1}
+time_mapping = {'W': 604800, 'D': 86400, 'H': 3600, 'M': 60, 'S': 1}
 
 
 @ban_matcher.handle()
@@ -61,19 +61,17 @@ async def handle_mute(event: GroupMessageEvent):
     if victim.get_permission() >= sender.get_permission():  # 如果被禁言的用户权限高于执行者，则拒绝执行
         await mute_matcher.finish('你不能禁言比自己权限高的人！')
 
-    if not time[:-1].isdigit():  # 如果禁言时间不是纯数字，则提醒用户输入正确的参数
-        await mute_matcher.finish('第二个参数禁言时间不是数字，请重新输入！')
-
     # 将禁言时间转换为秒数
-    time = (int(time[:-1]) * time_mapping.get(time[-1].upper(), 0))
-    if time < 0:  # 如果禁言时间小于或等于 0，则提醒用户输入正确的参数
+    mute_time = 0
+    for time in time.split('+'): mute_time += (int(time[:-1]) * time_mapping.get(time[-1].upper(), 0))  # 遍历时间单位并计算秒数
+    if mute_time < 0:  # 如果禁言时间小于或等于 0，则提醒用户输入正确的参数
         await mute_matcher.finish('时间参数输入错误或者格式不正确，请重新尝试！')
 
     try:  # 禁言用户
-        await group.mute(victim, time)
+        await group.mute(victim, mute_time)
     except ActionFailed:
         await mute_matcher.finish('没有权限执行此操作！')
-    await mute_matcher.finish(F'已将用户 {victim.id} 禁言 {time} 秒。')
+    await mute_matcher.finish(F'已将用户 {victim.id} 禁言 {mute_time} 秒。')
 
 
 @kick_matcher.handle()
