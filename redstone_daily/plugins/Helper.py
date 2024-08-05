@@ -46,6 +46,7 @@ async def rd_commands(args: Message = CommandArg()):
         '封禁: ban',
         '运势: luck',
         '命运骰子: dice',
+        'TO-DO: todo'
     ]
 
     async def send_commands(start, end, page):
@@ -146,13 +147,29 @@ async def rd_tutorial(args: Message = CommandArg()):
             await tutorial.finish('dice 命运骰子 aliases=命运骰子, 命运色子\n'
                                   '指定一位成员参与, 随机禁言成员或者发送者\n'
                                   '参数: {qq_number}参与者 []')
+        elif command == 'todo':
+            await tutorial.finish('todo 待办事项\n'
+                                  '参数: {command} [args]\n'
+                                  'todo 命令列表:\n'
+                                  'todo create {args] 添加待办事项\n'
+                                  '- 参数(无顺序限制, 不可包含空格):\n'
+                                  '- title=<你的标题> 必填 字符串 事项标题\n'
+                                  '- content=<你的正文> 选填 字符串 事项正文(补充内容)\n'
+                                  '- user=<责任人> 选填 QQ号或at 责任人(不填则为自己)\n'
+                                  '- ddl=<截止日期> 选填 时间戳 截止日期\n'
+                                  '- req=<前置待办> 选填 列表 格式为 a,b,c,d(整数) 前置待办id 当所有前置待办完成才会显示\n'
+                                  'todo finished {id} 将某项标记为完成\n'
+                                  'todo list [user_qid] 查询某人的待办事项(无参数则为自己)\n'
+                                  'todo del {id} 删除待办事项 需要9级权限\n'
+                                  'todo del_all 删除所有待办事项 需要10级权限')
         else:
             await tutorial.finish('指令不存在')
     else:
         await tutorial.finish('RD QQ Bot使用教程\n---------\n'
                               '常规指令格式: .指令 选项1 选项2\n'
                               '使用tutorial [指令名] 查看该指令的详细教程\n'
-                              '选填参数[会以这种格式显示], 必填参数{会以这种格式显示}\n'
+                              '选填参数[会以这种格式显示], 必填参数{会以这种格式显示}, 部分必填参数{会以这种格式显示]'
+                              ', 参数中的参数<会以这种格式显示>\n'
                               '---------')
 
 

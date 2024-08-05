@@ -7,6 +7,7 @@ from nonebot.plugin import *
 from nonebot.adapters import Message
 from nonebot.params import CommandArg, Event
 from nonebot import require
+from scipy.stats import norm
 
 from redstone_daily.plugins.utils import get_context, User
 
@@ -33,32 +34,41 @@ async def handle_divine(event: Event):
     random.seed(int(sender) + int(_time - _time % 86400))  # 随机种子
 
     # 计算人品(运势, 财富, 事业, 健康)
-    luck = random.normalvariate(0, 15)
-    money = random.normalvariate(0, 15)
-    career = random.normalvariate(0, 15)
-    health = random.normalvariate(0, 15)
+    luck = random.normalvariate(0, 17)
+    money = random.normalvariate(0, 17)
+    career = random.normalvariate(0, 17)
+    health = random.normalvariate(0, 17)
 
     # 计算均值
     mean = (luck + money + career + health) / 4
 
     def get_score(score):
         # 评价分数映射表
+        mark_string = ""
         score_map = {
-            -50: "衰神附体",
-            -40: "倒了血霉",
-            -30: "运势极差",
-            -20: "运势不佳",
-            -10: "运势较差",
-            0: "运势一般",
-            10: "运势较好",
-            20: "运势优秀",
-            30: "运势极佳",
-            40: "神佛降临",
-            50: "天命赐福"}
+            -25: "衰神附体",
+            -20: "倒了血霉",
+            -12: "运势极差",
+            -7: "运势不佳",
+            -3: "运势较差",
+            3: "运势一般",
+            7: "运势较好",
+            12: "运势优秀",
+            20: "运势极佳",
+            25: "祖上显灵",
+            99999999: "天命之子"}
 
         for i in score_map:
-            if score <= i + 5:
-                return score_map[i] + f"({round(score, 2)}%)" if score < 0 else score_map[i] + f"(+{round(score, 2)}%)"
+            if score <= i:
+                mark_string = score_map[i]  # 找到对应的评价
+                break
+
+        score_string = f"{round(score, 2)}%" if score < 0 else f"+{round(score, 2)}%"  # 给分数加上符号
+
+        cdf_value = norm.cdf(score, 0, 17)  # 计算累积分布函数值
+        cdf_string = f"{cdf_value:.2%}" if score < 0 else f"{(1 - cdf_value):.2%}"  # 变换累积分布函数值
+
+        return f"{mark_string}({score_string}|{cdf_string})"
 
     await divine.finish(f"今日人品: \n"
                         f"-------------\n"

@@ -66,7 +66,7 @@ async def handle_unsubscribe(event: Event):
 def get_data():
     for _ in range(5):
         try:
-            response = requests.get('https://redstonedaily.top/api/daily')
+            response = requests.get('https://redstonedaily.top/api/latest')
             if response.status_code == 200:
                 return response.json()
         except Exception:
@@ -87,7 +87,8 @@ def daily_handler():
         yield '今日前三甲：\n'
         for index, video in enumerate(videos[:3]):
             yield F'{chinese_numbers[index]} 《{video["title"]}》'
-            yield F'  {video["data"]["play"]} / {video["data"]["like"]} / {video["data"]["coin"]} / {video["data"]["favorite"]} / {video["data"]["share"]} = {round(video["data"]["score"], 2)}\n'
+            yield (F'  {video["data"]["play"]} / {video["data"]["like"]} / {video["data"]["coin"]} '
+                   F'/ {video["data"]["favorite"]} / {video["data"]["share"]} = {round(video["data"]["score"], 2)}\n')
         yield F'更多内容请访问：https://redstonedaily.top/#/daily/{data["title"].replace("-", "/")}'
         return None
     yield '获取日报失败，请稍后再试！运维或者前端来处理一下啊喂 TAT。'
@@ -102,7 +103,7 @@ async def everyday_task():
     # 推送订阅者
     for doc in get_database('subscribers').collection.find():
 
-        user = User(doc['id'])
+        user = User(int(doc['id']))
         if doc['sub']:
             # 发送私聊消息
             try:
@@ -111,7 +112,7 @@ async def everyday_task():
                 pass
             except Exception:
                 user.set_subscribe(False)  # 移除出错的订阅者
-                message = F'在尝试推送日报给用户 {doc} 时出错，已移除此订阅者！请加好友后尝试重新订阅。'
+                message = F'在尝试推送日报给用户 {user.id} 时出错，已移除此订阅者！请加好友后尝试重新订阅。'
                 await broadcast_message(bot, message)
 
 hour, minute = config.broadcast_time
