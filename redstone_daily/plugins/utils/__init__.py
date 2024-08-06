@@ -64,3 +64,6 @@ def get_all_ops() -> list:
     permissions = get_database('permissions').collection.find()  # 获取所有权限\
 
     return permissions  # 返回权限列表
+
+
+config_db = get_database('config').get_db()

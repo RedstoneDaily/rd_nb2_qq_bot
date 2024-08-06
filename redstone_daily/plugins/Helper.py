@@ -46,7 +46,8 @@ async def rd_commands(args: Message = CommandArg()):
         '封禁: ban',
         '运势: luck',
         '命运骰子: dice',
-        'TO-DO: todo'
+        'TO-DO: todo',
+        '推送管理: broadcast'
     ]
 
     async def send_commands(start, end, page):
@@ -164,6 +165,8 @@ async def rd_tutorial(args: Message = CommandArg()):
                                   'todo list [user_qid] 查询某人的待办事项(无参数则为自己)\n'
                                   'todo del {id} 删除待办事项 需要9级权限\n'
                                   'todo del_all 删除所有待办事项 需要10级权限')
+        elif command == 'broadcast':
+            await tutorial.finish('broadcast {stat} 推送管理\non / off 开启/关闭推送功能')
         else:
             await tutorial.finish('指令不存在')
     else:

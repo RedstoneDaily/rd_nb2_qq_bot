@@ -6,7 +6,7 @@ from nonebot import on_command
 from nonebot.params import CommandArg
 from nonebot.adapters.onebot.v11 import GroupMessageEvent, Message, Event
 
-from redstone_daily.plugins.utils import permission_required, get_context, User, get_database
+from redstone_daily.plugins.utils import permission_required, get_context, User, get_database, config_db
 
 op_sub_add_matcher = on_command(
     'op sub add', force_whitespace=True, priority=10, block=True)
@@ -78,3 +78,23 @@ async def perm_sub_clear(event: Event):
 
     await op_sub_clear_matcher.finish('确认清空所有订阅用户？请输入 "op sub clear confirm" 进行确认。')
 
+
+broadcast_matcher = on_command('broadcast', force_whitespace=True, priority=10, block=True)
+
+
+@broadcast_matcher.handle()
+@permission_required(10)
+async def broadcast(event: Event):
+    sender, arg, group = get_context(event)
+
+    if not arg:  # 没有参数
+        await broadcast_matcher.finish('参数错误: 不能为空！')
+
+    if arg[0] == 'on':
+        config_db.find_one_and_update({'type': 'config'}, {'$set': {'broadcast': True}})
+        await broadcast_matcher.finish('推送已开启！')
+    elif arg[0] == 'off':
+        config_db.find_one_and_update({'type': 'config'}, {'$set': {'broadcast': False}})
+        await broadcast_matcher.finish('推送已关闭！')
+    else:
+        await broadcast_matcher.finish('参数错误: 请输入 "on" 或 "off"！')

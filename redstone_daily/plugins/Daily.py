@@ -9,7 +9,7 @@ from nonebot import get_bot, on_command, require
 from nonebot.exception import FinishedException
 from nonebot.adapters.onebot.v11 import Event, Bot
 
-from .utils import get_context, get_database, User
+from .utils import get_context, get_database, User, config_db
 
 require('nonebot_plugin_apscheduler')
 from nonebot_plugin_apscheduler import scheduler
@@ -27,10 +27,10 @@ chinese_numbers = ['壹', '贰', '叁', '肆', '伍', '陆', '柒', '捌', '玖'
 
 
 @latest_matcher.handle()
-async def latest_daily(bot: Bot):
+async def latest_daily():
     ''' 返回最新一期的日报 '''
     try:
-        await broadcast_message(bot, '正在获取最新一期的日报，请稍后……')
+        await latest_matcher.send('正在获取最新一期的日报，请稍后……')
         message = turn_message(daily_handler())
         await latest_matcher.finish(message)
     except FinishedException:
@@ -96,6 +96,11 @@ def daily_handler():
 
 async def everyday_task():
     ''' 每天定时执行一次，推送最新一期的日报 '''
+
+    # 如果禁止推送，则直接返回
+    if not config_db.find_one({'type': 'config'})['broadcast']:
+        return
+
     bot: Bot = get_bot()
     message = turn_message(daily_handler())
     # 向每个推送群发送消息
