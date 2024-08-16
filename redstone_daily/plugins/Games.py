@@ -8,6 +8,7 @@ from nonebot.adapters import Message
 from nonebot.params import CommandArg, Event
 from nonebot import require
 from scipy.stats import norm
+from zhipuai import ZhipuAI
 
 from redstone_daily.plugins.utils import get_context, User
 
@@ -125,3 +126,14 @@ async def handle_dice(event: GroupMessageEvent):
         else:  # 骰子点数大于5, 禁言发送者
             await group.mute(sender, int(((num - 1) * 5) ** 2))
             await dice.finish(f"骰子停下了...玩弄命运者终将受到惩罚, 你被禁言了{int(((num - 1) * 5) ** 2)}秒")
+
+'''fish = on_keyword({'鱼上钩啦'})
+
+@fish.handle()
+async def handle_fish(event: Event):
+    sender, arg, group = get_context(event)
+    if group.id != 714475609:
+        return
+
+    await fish.send('收杆')
+    await fish.finish('钓鱼')'''

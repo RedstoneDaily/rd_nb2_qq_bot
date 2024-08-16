@@ -47,7 +47,8 @@ async def rd_commands(args: Message = CommandArg()):
         '运势: luck',
         '命运骰子: dice',
         'TO-DO: todo',
-        '推送管理: broadcast'
+        '推送管理: broadcast',
+        '哔哩哔哩查成分: bili',
     ]
 
     async def send_commands(start, end, page):
@@ -73,7 +74,7 @@ async def rd_commands(args: Message = CommandArg()):
         if start > len(commands_list):  # 处理页码超出范围
             await commands.finish('页码超出范围')
 
-        await send_commands(start, end, page)
+        await send_commands(start, end+1, page)
 
 
 tutorial = on_command('tutorial')
@@ -141,7 +142,7 @@ async def rd_tutorial(args: Message = CommandArg()):
         elif command == 'ban':
             await tutorial.finish('ban 封禁\n'
                                   '参数: {qq_number}封禁指定用户')
-        elif command == 'luck':
+        elif command in ['luck', '运势', '人品', '今日人品', 'jrrp']:
             await tutorial.finish('luck 今日运势 aliases=运势, 人品, 今日人品, jrrp\n'
                                   '参数: 无需参数')
         elif command == 'dice':
@@ -167,6 +168,10 @@ async def rd_tutorial(args: Message = CommandArg()):
                                   'todo del_all 删除所有待办事项 需要10级权限')
         elif command == 'broadcast':
             await tutorial.finish('broadcast {stat} 推送管理\non / off 开启/关闭推送功能')
+        elif command in ['bili', '查成分', '查用户']:
+            await tutorial.finish('bili 哔哩哔哩用户成分查询 aliases=查成分, 查用户\n'
+                                  '参数: {uid} 用户UID'
+                                  '[count] 条数(默认10条)')
         else:
             await tutorial.finish('指令不存在')
     else:
