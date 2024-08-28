@@ -76,7 +76,8 @@ async def handle_status(event: Event):
 
         await status_matcher.send(message)
 
-    await status_matcher.send(f"所有测试点均已完成，总共{all_points}个测试点，通过{passed_points}个，失败{failed_points}个，通过率{passed_points/all_points*100:.2f}%。")
+    await status_matcher.send(f"所有测试点均已完成，总共{all_points}个测试点，通过{passed_points}个，失败{failed_points}个，"
+                              f"通过率{passed_points/all_points*100:.2f}%。")
 
 
 page_matcher = on_command('dev', aliases={'page'})
