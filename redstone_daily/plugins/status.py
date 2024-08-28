@@ -3,6 +3,7 @@ import requests
 from nonebot.adapters.onebot.v11 import Event
 from nonebot.plugin.on import on_command
 
+from redstone_daily.plugins.Config import config
 from redstone_daily.plugins.utils import get_database
 
 """
@@ -76,3 +77,23 @@ async def handle_status(event: Event):
         await status_matcher.send(message)
 
     await status_matcher.send(f"所有测试点均已完成，总共{all_points}个测试点，通过{passed_points}个，失败{failed_points}个，通过率{passed_points/all_points*100:.2f}%。")
+
+
+page_matcher = on_command('dev', aliases={'page'})
+
+@page_matcher.handle()
+async def handle_page(event: Event):
+    await page_matcher.send('正在查询最新测试页面...')
+
+    url = (f'https://api.cloudflare.com/client/v4/accounts/{config.cf_account_id}'
+           f'/pages/projects/{config.cf_project_name}/deployments')
+    headers = {'Authorization': f'Bearer {config.cf_api_token}',}
+
+    response = requests.get(url, headers=headers)
+    data = response.json()
+
+    if response.status_code == 200:
+        await page_matcher.finish(f"戳我查看:\n→{data['result'][0]['url']}←")
+
+    else:
+        await page_matcher.finish(f"查询失败，错误：{data}, url={url}")

@@ -11,6 +11,9 @@ class Config(BaseModel):
     superusers: list[int] = []
     broadcast_time: list[int] = []
     broadcast_groups: list[int] = []
+    cf_account_id: str = None
+    cf_project_name: str = None
+    cf_api_token: str = None
 
     @classmethod
     def check_superusers(self, value: list[int]):

@@ -40,6 +40,7 @@ async def rd_commands(args: Message = CommandArg()):
         '新用户欢迎: welcomenew',
         'OP指令: op',
         '禁言: mute',
+
         '修改昵称: nickname',
         '修改头衔: title',
         '踢出群聊: kick',
@@ -49,6 +50,7 @@ async def rd_commands(args: Message = CommandArg()):
         'TO-DO: todo',
         '推送管理: broadcast',
         '哔哩哔哩查成分: bili',
+        '最新测试页面: dev',
     ]
 
     async def send_commands(start, end, page):
@@ -172,6 +174,8 @@ async def rd_tutorial(args: Message = CommandArg()):
             await tutorial.finish('bili 哔哩哔哩用户成分查询 aliases=查成分, 查用户\n'
                                   '参数: {uid} 用户UID'
                                   '[count] 条数(默认10条)')
+        elif command in ['dev', 'page']:
+            await tutorial.finish('dev 最新测试页面 aliases=page\n')
         else:
             await tutorial.finish('指令不存在')
     else:

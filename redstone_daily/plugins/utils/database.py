@@ -6,13 +6,9 @@ from nonebot.plugin import *
 config = nonebot.get_driver().config
 
 # 读取配置文件
-host = config.db_host
-port = config.db_port
-username = config.db_username
-password = config.db_password
-
+host = config.db_connection
 # 连接数据库
-client = pymongo.MongoClient(host, port, username=username, password=password)
+client = pymongo.MongoClient(host)
 
 
 class Database:
