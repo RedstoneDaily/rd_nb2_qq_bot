@@ -1,3 +1,4 @@
+import requests
 from nonebot.adapters.onebot.v11 import MessageSegment
 from . import database as db
 import nonebot, nonebot.adapters.onebot.v11
@@ -74,3 +75,11 @@ class User:
          """
 
         await nonebot.get_bot().send_private_msg(user_id=self.id, message=msg)
+
+    @property
+    def name(self) -> str:
+        """
+        获取用户昵称
+        """
+
+        return requests.get('https://api.03c3.cn/api/qqName', params={'uin': self.id}).json()['data']['nickname']

@@ -37,7 +37,7 @@ async def handle_ban(event: GroupMessageEvent):
     except ActionFailed:
         await ban_matcher.finish('没有权限执行此操作！')
 
-    await ban_matcher.finish(F'已将用户 {victim.id} 拉黑。')
+    await ban_matcher.finish(F'已将用户 {victim.name} 拉黑。')
 
 
 @mute_matcher.handle()
@@ -71,7 +71,7 @@ async def handle_mute(event: GroupMessageEvent):
         await group.mute(victim, mute_time)
     except ActionFailed:
         await mute_matcher.finish('没有权限执行此操作！')
-    await mute_matcher.finish(F'已将用户 {victim.id} 禁言 {mute_time} 秒。')
+    await mute_matcher.finish(F'已将用户 {victim.name} 禁言 {mute_time} 秒。')
 
 
 @kick_matcher.handle()
@@ -96,7 +96,7 @@ async def handle_kick(event: GroupMessageEvent):
     except ActionFailed:
         await kick_matcher.finish('没有权限执行此操作！')
 
-    await kick_matcher.finish(F'已将用户 {victim.id} 踢出群组。')
+    await kick_matcher.finish(F'已将用户 {victim.name} 踢出群组。')
 
 
 """@title_matcher.handle()
@@ -146,4 +146,4 @@ async def handle_nickname(event: GroupMessageEvent):
         await group.set_nickname(user, nickname)
     except ActionFailed:
         await nickname_matcher.finish('没有权限执行此操作！')
-    await nickname_matcher.finish(F'已将用户 {user.id} 的群昵称改为 {nickname}。')
+    await nickname_matcher.finish(F'已将用户 {user.name} 的群昵称改为 {nickname}。')

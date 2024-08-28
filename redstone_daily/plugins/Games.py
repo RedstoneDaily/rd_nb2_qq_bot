@@ -120,9 +120,11 @@ async def handle_dice(event: GroupMessageEvent):
         await dice.send(f"你向{arg[0]}投出了一枚命运的骰子...")
         time.sleep(1)
 
+        victim = User(int(arg[0]))
+
         if num <= 5:  # 骰子点数小于等于5, 禁言玩家
-            await group.mute(User(int(arg[0])), int(((6 - num) * 5) ** 2))
-            await dice.finish(f"骰子停下了...{arg[0]}被禁言了{int(((6 - num) * 5) ** 2)}秒")
+            await group.mute(victim, int(((6 - num) * 5) ** 2))
+            await dice.finish(f"骰子停下了...{victim.name}被禁言了{int(((6 - num) * 5) ** 2)}秒")
         else:  # 骰子点数大于5, 禁言发送者
             await group.mute(sender, int(((num - 1) * 5) ** 2))
             await dice.finish(f"骰子停下了...玩弄命运者终将受到惩罚, 你被禁言了{int(((num - 1) * 5) ** 2)}秒")
