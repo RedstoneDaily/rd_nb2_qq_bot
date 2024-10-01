@@ -40,7 +40,7 @@ async def at():
     :return:
     """
 
-    await at_bot.finish("喵喵喵? 喵喵喵, /rdhelp 喵喵喵喵喵!")'''
+    await at_bot.finish("喵喵喵? 喵喵喵, /help 喵喵喵喵喵!")'''
 
 welcome = on_command("welcomenew")
 
@@ -51,7 +51,7 @@ async def welcome_new():
     新用户欢迎
     """
     await welcome.finish("欢迎新朋友！\n"
-                         "使用 /rdhelp 获取更多信息")
+                         "使用 /help 获取更多信息")
 
 
 point24 = on_command("24point")
