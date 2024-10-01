@@ -6,7 +6,7 @@ from nonebot.params import CommandArg
 所有帮助信息都在这里qwq
 """
 
-_help = on_command("rdhelp")
+_help = on_command("help")
 
 @_help.handle()
 async def rd_help():
@@ -32,7 +32,7 @@ async def rd_commands(args: Message = CommandArg()):
 
     commands_list = [
         "最新日报: /latest",
-        "帮助信息: /rdhelp",
+        "帮助信息: /help",
         "指令列表: /commands",
         "使用教程: /tutorial",
         "关于我们: /about",
@@ -90,7 +90,7 @@ async def rd_tutorial(args: Message = CommandArg()):
             await tutorial.finish("/latest 显示最新一期的日报\n"
                                   "参数: 无需参数")
         elif command == "rdhelp":
-            await tutorial.finish("/rdhelp 显示帮助信息\n"
+            await tutorial.finish("/help 显示帮助信息\n"
                                   "参数: 无需参数")
         elif command == "commands":
             await tutorial.finish("/commands 显示指令列表\n"
@@ -164,5 +164,5 @@ async def rd_about():
     显示关于我们信息
     """
     await about.finish("红石日报Redstone Daily是一个开源非盈利的网站项目，收集跟进全网红石科技最新前沿进展，并以日报、周报、月报以及年报的形式发布。\n"
-                       "更多信息请访问：https://redstonedaily.top/ https://docs.qq.com/doc/DTW9CZEVCcFNhR0px\n"
-                       "RD QQ Bot作者: @creepebucket(creepebucket@qq.com)")
+                       "更多信息请访问：https://www.rsdaily.com/ https://redstone-daily.notion.site/Redstone-Daily-7e55265d870b424594c74acb65e3f62a\n"
+                       "RD QQ Bot作者: @creepebucket(creepebucket@qq.com), @LonelySail(xiaocaicai_email@sina.com),@So_Cute_Hamster(1754005120@qq.com)")
