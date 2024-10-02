@@ -1,3 +1,5 @@
+import time
+
 from .Config import config
 from redstone_daily.Data import Subscribers
 from redstone_daily.Utils import turn_message, broadcast_message
@@ -65,12 +67,9 @@ async def handle_unsubscribe(event: Event):
 
 def get_data():
     for _ in range(5):
-        try:
-            response = requests.get('https://redstonedaily.top/api/latest')
-            if response.status_code == 200:
-                return response.json()
-        except Exception:
-            pass
+        response = requests.get('https://api.rsdaily.com/v2/daily')
+        if response.status_code == 200:
+            return response.json()
 
 
 def daily_handler():
@@ -81,15 +80,14 @@ def daily_handler():
     '''
     if data := get_data():
         # 解析视频
-        videos: list = data['content']
-        videos.sort(key=lambda info: info['data']['score'], reverse=True)  # 按评分排序
-        yield F'最新日报：{data["title"]}'  # 发送消息
+        videos: list = data
+        videos.sort(key=lambda info: info['data']['like'], reverse=True)  # 按评分排序
+        yield F'最新日报：{videos[0]["date"]}'  # 发送消息
         yield '今日前三甲：\n'
         for index, video in enumerate(videos[:3]):
             yield F'{chinese_numbers[index]} 《{video["title"]}》'
-            yield (F'  {video["data"]["play"]} / {video["data"]["like"]} / {video["data"]["coin"]} '
-                   F'/ {video["data"]["favorite"]} / {video["data"]["share"]} = {round(video["data"]["score"], 2)}\n')
-        yield F'更多内容请访问：https://redstonedaily.top/#/daily/{data["title"].replace("-", "/")}'
+            yield F'{video['url']}\n'
+        yield F'更多内容请访问：https://www.rsdaily.com/#/daily/{videos[0]["date"].replace("-", "/")}'
         return None
     yield '获取日报失败，请稍后再试！运维或者前端来处理一下啊喂 TAT。'
 
