@@ -52,7 +52,7 @@ def get_daily():
     third = (f"叁 {videos[2]['title']}\n{videos[2]['data']['play']} / {videos[2]['data']['like']} / "
              f"{videos[2]['data']['coin']} / {videos[2]['data']['favorite']} / {videos[2]['data']['share']} = {round(videos[2]['data']['score'], 2)}\n\n") if len(
         videos) >= 3 else ""
-    link = f"更多内容请访问：https://redstonedaily.top/#/daily/{data['title'].split('-')[0]}/{data['title'].split('-')[1]}/{data['title'].split('-')[2]}"
+    link = f"更多内容请访问：https://www.rsdaily.com/#/daily/{data['title'].split('-')[0]}/{data['title'].split('-')[1]}/{data['title'].split('-')[2]}"
 
     return log + head + second + third + link
 
