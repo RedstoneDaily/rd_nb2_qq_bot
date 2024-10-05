@@ -1,5 +1,6 @@
 import nonebot
 import requests
+import cloudflare
 from nonebot.adapters.onebot.v11 import Event
 from nonebot.plugin.on import on_command
 
@@ -85,16 +86,37 @@ page_matcher = on_command('dev', aliases={'page'})
 @page_matcher.handle()
 async def handle_page(event: Event):
     await page_matcher.send('正在查询最新测试页面...')
+    message = ''
+    
+    try:
+        # https://github.com/cloudflare/cloudflare-python
+        # https://developers.cloudflare.com/api/operations/pages-deployment-get-deployments
+        client = cloudflare.AsyncCloudflare(api_token=config.cf_api_token)
+        results = {}
+        project = await client.pages.projects.get(
+            account_id=config.cf_account_id,
+            project_name=config.cf_project_name
+        )
 
-    url = (f'https://api.cloudflare.com/client/v4/accounts/{config.cf_account_id}'
-           f'/pages/projects/{config.cf_project_name}/deployments')
-    headers = {'Authorization': f'Bearer {config.cf_api_token}',}
-
-    response = requests.get(url, headers=headers)
-    data = response.json()
-
-    if response.status_code == 200:
-        await page_matcher.finish(f"戳我查看:\n→{data['result'][0]['url']}←")
-
-    else:
-        await page_matcher.finish(f"查询失败，错误：{data}, url={url}")
+        async for deployment in await client.pages.projects.deployments.list(
+            account_id=config.cf_account_id,
+            project_name=config.cf_project_name
+        ):
+            url = f'https://{project.subdomain}' if deployment.environment == 'production' else (deployment.aliases or [None])[0]
+            if not url is None and results.get(url) is None:
+                results[url] = deployment
+        
+        if results.keys():
+            sorted_urls = sorted(results.keys(), key=lambda x: x[::-1])     # sort by reverse
+            message = "戳我查看:\n" + "\n".join(f"→{url}←" for url in sorted_urls)
+        else:
+            message = "没有找到任何部署喵~"
+        
+    except cloudflare.APIConnectionError as e:
+        message = f"查询失败，API连接错误\n原因：{e.__cause__}"
+    except cloudflare.RateLimitError as e:
+        message = "查询失败，API请求频率已达上限"
+    except cloudflare.APIStatusError as e:
+        message = f"查询失败，状态码：{e.status_code}\n错误信息：\n{e.response}"
+    
+    await page_matcher.finish(message)
