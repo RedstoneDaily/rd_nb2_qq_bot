@@ -175,7 +175,9 @@ async def rd_tutorial(args: Message = CommandArg()):
                                   '参数: {uid} 用户UID'
                                   '[count] 条数(默认10条)')
         elif command in ['dev', 'page']:
-            await tutorial.finish('dev 最新测试页面 aliases=page\n')
+            await tutorial.finish('dev 测试页面操作 aliases=page\n'
+                                  'dev info / dev 查询测试页面信息\n'
+                                  'dev del {branch} 删除与某分支关联的测试页面\n')
         else:
             await tutorial.finish('指令不存在')
     else:

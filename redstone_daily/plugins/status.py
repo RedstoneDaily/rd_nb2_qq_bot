@@ -1,11 +1,19 @@
 import nonebot
 import requests
-import cloudflare
+from datetime import datetime
+import cloudflare, pytz
+from cloudflare.types.pages import (
+    Deployment,
+    Project,
+    Stage,
+)
+
 from nonebot.adapters.onebot.v11 import Event
 from nonebot.plugin.on import on_command
+from nonebot.adapters.onebot.v11 import GroupMessageEvent
 
 from redstone_daily.plugins.Config import config
-from redstone_daily.plugins.utils import get_database
+from redstone_daily.plugins.utils import get_database, permission_required, get_context, User
 
 """
 查询服务器状态
@@ -84,7 +92,18 @@ async def handle_status(event: Event):
 page_matcher = on_command('dev', aliases={'page'})
 
 @page_matcher.handle()
-async def handle_page(event: Event):
+async def handle_page(event: GroupMessageEvent):
+    
+    sender, arg, group = get_context(event)
+    
+    if len(arg) == 0 or len(arg) == 1 and arg[0] == 'info':
+        await handle_page_info(event)
+    elif len(arg) == 2 and arg[0] == 'del':
+        await handle_page_del(event)
+
+
+async def handle_page_info(event: Event):
+
     await page_matcher.send('正在查询最新测试页面...')
     message = ''
     
@@ -118,5 +137,48 @@ async def handle_page(event: Event):
         message = "查询失败，API请求频率已达上限"
     except cloudflare.APIStatusError as e:
         message = f"查询失败，状态码：{e.status_code}\n错误信息：\n{e.response}"
+    
+    await page_matcher.finish(message)
+
+
+@permission_required(9)
+async def handle_page_del(event: GroupMessageEvent):
+
+    sender, arg, group = get_context(event)
+    target_branch = arg[1]
+
+    await page_matcher.send(f"正在删除与分支\"{target_branch}\"关联的部署...")
+    message = ''
+
+    try:
+        # https://github.com/cloudflare/cloudflare-python
+        # https://developers.cloudflare.com/api/operations/pages-deployment-get-deployments
+        client = cloudflare.AsyncCloudflare(api_token=config.cf_api_token)
+
+        selected_deployments: list[Deployment] = []
+        async for deployment in await client.pages.projects.deployments.list(
+            account_id=config.cf_account_id,
+            project_name=config.cf_project_name
+        ):
+            if deployment.id is None:
+                continue
+            metadata = deployment.deployment_trigger.metadata if deployment.deployment_trigger is not None else None
+            branch = metadata.branch if metadata is not None else None
+            if branch == target_branch:
+                selected_deployments.append(deployment)
+                await client.pages.projects.deployments.delete(
+                    account_id=config.cf_account_id,
+                    project_name=config.cf_project_name,
+                    deployment_id=deployment.id
+                )
+
+        message = f"已删除与分支\"{target_branch}\"关联的{len(selected_deployments)}个部署。"
+
+    except cloudflare.APIConnectionError as e:
+        message = f"操作失败，API连接错误\n原因：{e.__cause__}"
+    except cloudflare.RateLimitError as e:
+        message = "操作失败，API请求频率已达上限"
+    except cloudflare.APIStatusError as e:
+        message = f"操作失败，状态码：{e.status_code}\n信息：\n{e.response}"
     
     await page_matcher.finish(message)
